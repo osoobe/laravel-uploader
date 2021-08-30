@@ -210,6 +210,17 @@ class Upload extends Model
         return $this->belongsTo(config('Pharaonic.uploader.user', 'App\User'), 'uploader_id');
     }
 
+
+    /**
+     * Get the file absolute path
+     *
+     * @return string
+     */
+    public function filepath() {
+        $disk = config('Pharaonic.uploader.disk', 'public');
+        return storage_path("app/$disk/$this->path");
+    }
+
     /**
      * Getting Permits
      *
@@ -277,5 +288,37 @@ class Upload extends Model
         if ($permit) return $permit->delete();
 
         return false;
+    }
+
+
+    /**
+     * Is PDF file?
+     *
+     * @return boolean
+     */
+    public function isPDF() {
+        return $this->mime == 'application/pdf';
+    }
+
+    /**
+     * Scope a query to only return the given MIME type.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param string $type  MIME Type
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeMimeType($query, $type) {
+        return $query->where('mime', $type);
+    }
+
+
+    /**
+     * Scope a query to only return pdf files.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePDF($query) {
+        return $query->where('mime', 'application/pdf');
     }
 }
